@@ -21,13 +21,23 @@ class UserController extends BaseController
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'sometimes|string|max:20|unique:users,phone,' . $user->id,
+            'profile_photo' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
         ]);
 
         if ($validator->fails()) {
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
-        $user->update($request->all());
+        $user->update($request->except('profile_photo'));
+        if ($request->hasFile('profile_photo')) {
+            //detach old media if exists
+            $user->clearMediaCollection('profile_photo');
+
+            //add new media
+            $user->addMediaFromRequest('profile_photo')
+                ->toMediaCollection('profile_photo');
+        }
 
         return $this->sendResponse($user, 'User updated successfully.');
     }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained('food_categories')->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
+            $table->string('image_path')->nullable();
             $table->decimal('calories', 8, 2);
             $table->decimal('protein', 6, 2);
             $table->decimal('carbs', 6, 2);
@@ -24,6 +25,8 @@ return new class extends Migration
             $table->string('serving_size', 50);
             $table->integer('cooking_time')->nullable();
             $table->boolean('is_pregnancy_safe')->default(true);
+            $table->json('allergens')->nullable();
+            $table->json('diet_types')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

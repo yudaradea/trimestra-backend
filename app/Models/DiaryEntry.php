@@ -39,6 +39,9 @@ class DiaryEntry extends Model
         'exercise_duration' => 'integer',
     ];
 
+    // Indexing untuk query optimization
+    protected $with = []; // Tidak eager load by default karena bisa berat
+
     // Relasi
     public function user()
     {
@@ -58,5 +61,26 @@ class DiaryEntry extends Model
     public function device()
     {
         return $this->belongsTo(Device::class);
+    }
+
+    // Scope untuk query optimization
+    public function scopeByDate($query, $date)
+    {
+        return $query->where('date', $date);
+    }
+
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeMealEntries($query)
+    {
+        return $query->whereIn('meal_type', ['breakfast', 'lunch', 'dinner', 'snack']);
+    }
+
+    public function scopeExerciseEntries($query)
+    {
+        return $query->where('meal_type', 'exercise');
     }
 }

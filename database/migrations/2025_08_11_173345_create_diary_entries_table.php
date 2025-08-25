@@ -15,12 +15,12 @@ return new class extends Migration
             $table->enum('meal_type', ['breakfast', 'lunch', 'dinner', 'snack', 'exercise']);
             $table->foreignId('food_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('recipe_id')->nullable()->constrained()->onDelete('cascade');
-            $table->decimal('quantity', 6, 2)->default(1); // number of servings
-            $table->decimal('calories', 8, 2);
-            $table->decimal('protein', 6, 2);
-            $table->decimal('carbs', 6, 2);
-            $table->decimal('fat', 6, 2);
-            $table->decimal('fiber', 6, 2);
+            $table->decimal('quantity', 6, 2)->nullable(); // nullable untuk exercise
+            $table->decimal('calories', 8, 2)->nullable(); // nullable
+            $table->decimal('protein', 6, 2)->nullable(); // nullable
+            $table->decimal('carbs', 6, 2)->nullable(); // nullable
+            $table->decimal('fat', 6, 2)->nullable(); // nullable
+            $table->decimal('fiber', 6, 2)->nullable(); // nullable
             $table->string('exercise_type')->nullable();
             $table->decimal('calories_burned', 8, 2)->nullable();
             $table->integer('exercise_duration')->nullable(); // minutes

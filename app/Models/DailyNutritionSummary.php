@@ -9,6 +9,8 @@ class DailyNutritionSummary extends Model
 {
     use HasFactory;
 
+    protected $table = 'daily_nutrition_summary';
+
     protected $fillable = [
         'user_id',
         'date',

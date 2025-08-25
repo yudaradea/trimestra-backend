@@ -4,18 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 use Laravel\Scout\Searchable;
 
-class Food extends Model implements HasMedia
+
+
+class Food extends Model
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory;
 
     protected $fillable = [
         'category_id',
         'name',
         'description',
+        'image_path',
         'calories',
         'protein',
         'carbs',
@@ -24,6 +25,8 @@ class Food extends Model implements HasMedia
         'serving_size',
         'cooking_time',
         'is_pregnancy_safe',
+        'allergens',
+        'diet_types',
         'is_active',
     ];
 
@@ -35,8 +38,13 @@ class Food extends Model implements HasMedia
         'fiber' => 'decimal:2',
         'cooking_time' => 'integer',
         'is_pregnancy_safe' => 'boolean',
+        'allergens' => 'array',
+        'diet_types' => 'array',
         'is_active' => 'boolean',
     ];
+
+    // Index untuk query optimization
+    protected $with = ['category']; // Eager load category by default
 
     // Tentukan field yang bisa di-search
     public function toSearchableArray()
@@ -66,5 +74,26 @@ class Food extends Model implements HasMedia
     public function diaryEntries()
     {
         return $this->hasMany(DiaryEntry::class);
+    }
+
+    // Scope untuk query optimization
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopePregnancySafe($query)
+    {
+        return $query->where('is_pregnancy_safe', true);
+    }
+
+    public function scopeByCategory($query, $categoryId)
+    {
+        return $query->where('category_id', $categoryId);
+    }
+
+    public function scopeCalorieRange($query, $min, $max)
+    {
+        return $query->whereBetween('calories', [$min, $max]);
     }
 }

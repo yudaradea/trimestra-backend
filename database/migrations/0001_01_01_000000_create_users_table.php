@@ -18,6 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone')->nullable();
+            $table->string('profile_photo')->nullable();
+            $table->enum('role', ['user', 'admin'])->default('user');
             $table->boolean('fingerprint_enabled')->default(false);
             $table->boolean('device_connected')->default(false);
             $table->unsignedBigInteger('device_id')->nullable();
