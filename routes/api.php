@@ -48,7 +48,7 @@ Route::prefix('v1')->group(function () {
         // 🔐 AUTH
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('user', [AuthController::class, 'user']);
-        Route::put('user', [UserController::class, 'update']);
+        Route::post('user', [UserController::class, 'update']);
         Route::delete('user', [UserController::class, 'destroy']);
 
         // 🔄 ONBOARDING PROGRESS
@@ -79,6 +79,7 @@ Route::prefix('v1')->group(function () {
             Route::get('diary', [DiaryController::class, 'index']);
             Route::post('diary', [DiaryController::class, 'store']);
             Route::get('diary/summary', [DiaryController::class, 'summary']);
+            Route::post('diary/sync-target-calories', [DiaryController::class, 'syncTargetCalories']);
 
             // 🏃 EXERCISE SYNC (dari alat - rate limit khusus)
             Route::post('device/sync-exercise', [DeviceController::class, 'syncExercise'])

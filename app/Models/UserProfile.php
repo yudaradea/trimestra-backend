@@ -18,6 +18,7 @@ class UserProfile extends Model
         'pregnancy_weeks',
         'is_first_pregnancy',
         'diet_preference',
+        'target_calories',
         'health_goals',
     ];
 
@@ -28,6 +29,8 @@ class UserProfile extends Model
         'is_pregnant' => 'boolean',
         'is_first_pregnancy' => 'boolean',
         'health_goals' => 'array',
+        'target_calories' => 'integer',
+        'pregnancy_weeks' => 'integer',
     ];
 
     // Relasi

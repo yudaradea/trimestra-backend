@@ -58,7 +58,7 @@ class DiaryController extends BaseController
         $date = $request->get('date', date('Y-m-d'));
         $user = Auth::user();
 
-        $entries = $this->diaryService->getDiaryEntries($user->id, $date);
+        $entries = $this->diaryService->getRecentDiaryEntries($user->id, $date);
         $summary = $this->diaryService->getDailySummary($user->id, $date);
 
         $data = [
@@ -167,8 +167,31 @@ class DiaryController extends BaseController
         $date = $request->get('date', date('Y-m-d'));
         $user = Auth::user();
 
-        $summary = $this->diaryService->getDailySummary($user->id, $date);
+        try {
+            // Always get fresh summary with current target
+            $summary = $this->diaryService->getDailySummary($user->id, $date);
 
-        return $this->sendResponse($summary, 'Daily summary retrieved successfully.');
+            return $this->sendResponse($summary, 'Daily summary retrieved successfully.');
+        } catch (\Exception $e) {
+            return $this->sendError('Failed to retrieve daily summary: ' . $e->getMessage());
+        }
+    }
+
+    // ✅ TAMBAHKAN: Endpoint untuk sync target calories
+    public function syncTargetCalories(Request $request)
+    {
+        $user = Auth::user();
+        $date = $request->get('date', date('Y-m-d'));
+
+        try {
+            $targetCalories = $this->diaryService->syncTargetCalories($user->id, $date);
+
+            // Get updated summary
+            $summary = $this->diaryService->getDailySummary($user->id, $date);
+
+            return $this->sendResponse($summary, 'Target calories synced successfully.');
+        } catch (\Exception $e) {
+            return $this->sendError('Failed to sync target calories: ' . $e->getMessage());
+        }
     }
 }

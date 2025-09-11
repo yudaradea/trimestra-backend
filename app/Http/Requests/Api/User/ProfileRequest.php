@@ -21,6 +21,7 @@ class ProfileRequest extends FormRequest
             'pregnancy_weeks' => 'nullable|integer|min:1|max:40|required_if:is_pregnant,1',
             'is_first_pregnancy' => 'nullable|boolean',
             'diet_preference' => 'required|in:normal,vegetarian',
+            'target_calories' => 'nullable|integer|min:800|max:5000',
             'health_goals' => 'required|array|min:1',
             'health_goals.*' => 'string',
         ];
@@ -46,6 +47,9 @@ class ProfileRequest extends FormRequest
             'pregnancy_weeks.min' => 'Pregnancy weeks must be at least 1.',
             'pregnancy_weeks.max' => 'Pregnancy weeks must not exceed 40.',
             'diet_preference.required' => 'Diet preference is required.',
+            'target_calories.integer' => 'Target calories must be a number.', // ✅ TAMBAHKAN INI
+            'target_calories.min' => 'Target calories must be at least 800.', // ✅ TAMBAHKAN INI
+            'target_calories.max' => 'Target calories must not exceed 5000.', // ✅ TAMBAHKAN INI
             'health_goals.required' => 'At least one health goal is required.',
             'health_goals.array' => 'Health goals must be an array.',
         ];

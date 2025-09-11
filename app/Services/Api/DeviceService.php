@@ -116,4 +116,15 @@ class DeviceService
             ]);
         }
     }
+
+    public function checkDeviceConnection(User $user)
+    {
+        return $user->device_connected && $user->device;
+    }
+
+    public function needsDeviceConnection(User $user)
+    {
+        // Jika user sudah connect device, tidak perlu alert
+        return !$this->checkDeviceConnection($user);
+    }
 }
