@@ -1,33 +1,31 @@
-# Gunakan PHP image
 FROM php:8.2-fpm
 
-# Install dependency system
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    unzip \
-    git \
-    curl \
     libpng-dev \
-    libonig-dev \
-    libxml2-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     zip \
+    git \
+    unzip \
+    curl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
 
 # Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Copy source code
 WORKDIR /var/www
+
 COPY . .
 
-# Install dependency Laravel
+# Install Laravel dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
-# Generate key (opsional, bisa pakai artisan nanti di CapRover hook)
-RUN php artisan config:clear && php artisan cache:clear
+# Laravel storage link
+RUN php artisan storage:link || true
 
-# Ganti ownership
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Set permissions (opsional, supaya storage dan bootstrap writable)
+RUN chmod -R 777 storage bootstrap/cache
 
-# Expose port untuk Nginx/PHP-FPM
-EXPOSE 9000
 CMD ["php-fpm"]
