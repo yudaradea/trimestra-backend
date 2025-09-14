@@ -95,7 +95,7 @@ class FoodController extends BaseController
     {
         // Use cache key for individual food items
         $food = Food::with('category:id,name,image_path')
-            ->select(['id', 'category_id', 'name', 'description', 'calories', 'protein', 'carbs', 'fat', 'fiber', 'serving_size', 'cooking_time', 'is_pregnancy_safe', 'is_active', 'allergens', 'diet_types', 'created_at', 'updated_at'])
+            ->select(['id', 'category_id', 'name', 'description', 'calories', 'protein', 'carbs', 'fat', 'fiber', 'serving_size', 'cooking_time', 'is_pregnancy_safe', 'is_active', 'allergens', 'diet_types', 'created_at', 'updated_at', 'image_path'])
             ->find($id);
 
         if (!$food) {
