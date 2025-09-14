@@ -78,6 +78,7 @@ Route::prefix('v1')->group(function () {
             // 📓 DIARY
             Route::get('diary', [DiaryController::class, 'index']);
             Route::post('diary', [DiaryController::class, 'store']);
+            Route::delete('diary/{id}', [DiaryController::class, 'destroy']);
             Route::get('diary/summary', [DiaryController::class, 'summary']);
             Route::post('diary/sync-target-calories', [DiaryController::class, 'syncTargetCalories']);
 

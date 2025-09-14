@@ -96,21 +96,25 @@ class FoodRecommendationService
             }
         }
     }
-
     private function applyCookingTimeFilter($query, $preferences)
     {
         if ($preferences && $preferences->cooking_time_preference && $preferences->cooking_time_preference !== 'not_sure') {
             switch ($preferences->cooking_time_preference) {
                 case '<15':
+                    // ✅ PERBAIKAN: Filter yang benar untuk < 15 menit
                     $query->where(function ($q) {
                         $q->where('cooking_time', '<', 15)
                             ->orWhereNull('cooking_time');
                     });
                     break;
+
                 case '15-30':
+                    // ✅ PERBAIKAN: Filter yang benar untuk 15-30 menit
                     $query->whereBetween('cooking_time', [15, 30]);
                     break;
+
                 case '>30':
+                    // ✅ PERBAIKAN: Filter yang benar untuk > 30 menit
                     $query->where('cooking_time', '>', 30);
                     break;
             }

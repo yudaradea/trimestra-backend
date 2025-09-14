@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Api\Diary\DiaryEntryRequest;
+use App\Models\DiaryEntry;
 use App\Services\Api\DiaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,16 +59,20 @@ class DiaryController extends BaseController
         $date = $request->get('date', date('Y-m-d'));
         $user = Auth::user();
 
-        $entries = $this->diaryService->getRecentDiaryEntries($user->id, $date);
-        $summary = $this->diaryService->getDailySummary($user->id, $date);
+        try {
+            $entries = $this->diaryService->getRecentDiaryEntries($user->id, $date);
+            $summary = $this->diaryService->getDailySummary($user->id, $date);
 
-        $data = [
-            'entries' => $entries,
-            'summary' => $summary,
-            'date' => $date
-        ];
+            $data = [
+                'entries' => $entries,
+                'summary' => $summary,
+                'date' => $date
+            ];
 
-        return $this->sendResponse($data, 'Diary entries retrieved successfully.');
+            return $this->sendResponse($data, 'Diary entries retrieved successfully.');
+        } catch (\Exception $e) {
+            return $this->sendError('Failed to retrieve diary entries: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -121,6 +126,32 @@ class DiaryController extends BaseController
             return $this->sendResponse($entry, 'Diary entry added successfully.');
         } catch (\Exception $e) {
             return $this->sendError('Failed to create diary entry', [$e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Delete diary entry
+     */
+    public function destroy($id)
+    {
+        $user = Auth::user();
+
+        try {
+            $entry = DiaryEntry::where('user_id', $user->id)->find($id);
+
+            if (!$entry) {
+                return $this->sendError('Diary entry not found.');
+            }
+
+            $date = $entry->date;
+            $entry->delete();
+
+            // Update daily summary after deletion
+            $this->diaryService->updateDailySummary($user->id, $date);
+
+            return $this->sendResponse([], 'Diary entry deleted successfully.');
+        } catch (\Exception $e) {
+            return $this->sendError('Failed to delete diary entry: ' . $e->getMessage());
         }
     }
 

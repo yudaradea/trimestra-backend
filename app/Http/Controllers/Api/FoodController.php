@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Services\Api\FoodRecommendationService;
 use App\Models\Food;
 use App\Models\FoodCategory;
+use App\Models\Recipe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -24,6 +25,57 @@ class FoodController extends BaseController
         $this->recommendationService = $recommendationService;
     }
 
+    private function applyFilters($query, $request)
+    {
+        // Category filter
+        if ($request->has('category_id') && $request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // Calorie range filter
+        if ($request->has('min_calories') && $request->min_calories) {
+            $query->where('calories', '>=', $request->min_calories);
+        }
+
+        if ($request->has('max_calories') && $request->max_calories) {
+            $query->where('calories', '<=', $request->max_calories);
+        }
+
+        // ✅ PERBAIKAN: Cooking time filter yang benar
+        if ($request->has('cooking_time') && $request->cooking_time) {
+            $cookingTime = $request->cooking_time;
+
+            switch ($cookingTime) {
+                case '<15':
+                    $query->where(function ($q) {
+                        $q->where('cooking_time', '<', 15)
+                            ->orWhereNull('cooking_time');
+                    });
+                    break;
+
+                case '15-30':
+                    $query->whereBetween('cooking_time', [15, 30]);
+                    break;
+
+                case '>30':
+                    $query->where('cooking_time', '>', 30);
+                    break;
+            }
+        }
+
+        // Diet type filter
+        if ($request->has('diet_type') && $request->diet_type) {
+            $dietType = $request->diet_type;
+            if ($dietType !== 'no_preference') {
+                $query->where(function ($q) use ($dietType) {
+                    $q->whereNull('diet_types')
+                        ->orWhere('diet_types', '[]')
+                        ->orWhere('diet_types', 'like', '%"' . $dietType . '"%');
+                });
+            }
+        }
+    }
+
     /**
      * Get all foods with pagination (optimized)
      */
@@ -31,9 +83,10 @@ class FoodController extends BaseController
     {
         $perPage = min($request->get('per_page', 20), 100); // Limit max per page
 
-        $foods = Food::with('category:id,name,image_path') // Select only needed fields
-            ->active()
-            ->paginate($perPage);
+        $query = Food::with('category:id,name,image_path'); // Select only needed fields
+        $this->applyFilters($query, $request);
+
+        $foods = $query->paginate($perPage);
 
         return $this->sendResponse($foods, 'Foods retrieved successfully.');
     }
@@ -76,14 +129,16 @@ class FoodController extends BaseController
         }
 
         // Optimized search with select
-        $foods = Food::with('category:id,name,image_path')
+        $foodsQuery = Food::with('category:id,name,image_path')
             ->active()
             ->where(function ($q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")
                     ->orWhere('description', 'LIKE', "%{$query}%");
             })
-            ->select(['id', 'category_id', 'name', 'description', 'calories', 'protein', 'carbs', 'fat', 'fiber', 'created_at']) // Select only needed fields
-            ->paginate($perPage);
+            ->select(['id', 'category_id', 'name', 'description', 'calories', 'protein', 'carbs', 'fat', 'fiber', 'created_at', 'image_path']);
+
+        $this->applyFilters($foodsQuery, $request);
+        $foods = $foodsQuery->paginate($perPage);
 
         return $this->sendResponse($foods, 'Search results retrieved successfully.');
     }
@@ -94,7 +149,11 @@ class FoodController extends BaseController
     public function show($id)
     {
         // Use cache key for individual food items
-        $food = Food::with('category:id,name,image_path')
+        $food = Food::with(
+            'category:id,name,image_path',
+            'recipes:id,food_id,title,prep_time,cook_time,servings,difficulty,ingredients,instructions'
+
+        )
             ->select(['id', 'category_id', 'name', 'description', 'calories', 'protein', 'carbs', 'fat', 'fiber', 'serving_size', 'cooking_time', 'is_pregnancy_safe', 'is_active', 'allergens', 'diet_types', 'created_at', 'updated_at', 'image_path'])
             ->find($id);
 

@@ -57,8 +57,32 @@ class DiaryService
                 $data['fat'] = $recipe->food->fat * $data['quantity'];
                 $data['fiber'] = $recipe->food->fiber * $data['quantity'];
             }
+        } elseif (isset($data['exercise_type']) && isset($data['exercise_duration'])) {
+            // Exercise entry - calories_burned dihitung dari device atau input manual
+            $data['calories_burned'] = $data['calories_burned'] ?? $this->estimateCaloriesBurned(
+                $data['exercise_type'],
+                $data['exercise_duration']
+            );
         }
     }
+
+    private function estimateCaloriesBurned($exerciseType, $duration)
+    {
+        // Estimasi berdasarkan jenis olahraga (dalam kalori per menit)
+        $caloriesPerMinute = [
+            'walking' => 4,
+            'jogging' => 8,
+            'running' => 12,
+            'cycling' => 6,
+            'swimming' => 10,
+            'yoga' => 3,
+            'default' => 5
+        ];
+
+        $rate = $caloriesPerMinute[strtolower($exerciseType)] ?? $caloriesPerMinute['default'];
+        return $rate * $duration;
+    }
+
 
 
     public function updateDailySummary($userId, $date)
@@ -206,6 +230,25 @@ class DiaryService
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
+    }
+
+    public function deleteDiaryEntry($entryId, $userId)
+    {
+        $entry = DiaryEntry::where('id', $entryId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$entry) {
+            throw new \Exception('Diary entry not found');
+        }
+
+        $date = $entry->date;
+        $entry->delete();
+
+        // Update daily summary after deletion
+        $this->updateDailySummary($userId, $date);
+
+        return true;
     }
 
     private function clearRelatedCaches($userId, $date)
