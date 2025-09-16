@@ -25,6 +25,9 @@ namespace App\Models{
  * @property numeric $target_calories
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read mixed $calorie_progress
+ * @property-read mixed $net_calories
+ * @property-read mixed $remaining_calories
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DailyNutritionSummary newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DailyNutritionSummary newQuery()
@@ -515,6 +518,7 @@ namespace App\Models{
  * @property int|null $pregnancy_weeks
  * @property bool|null $is_first_pregnancy
  * @property string $diet_preference
+ * @property int|null $target_calories
  * @property array<array-key, mixed> $health_goals
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -531,6 +535,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile whereIsFirstPregnancy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile whereIsPregnant($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile wherePregnancyWeeks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile whereTargetCalories($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile whereWeight($value)

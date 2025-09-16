@@ -60,7 +60,10 @@ class DiaryController extends BaseController
         $user = Auth::user();
 
         try {
+            // Ambil diary entries untuk tanggal yang dipilih
             $entries = $this->diaryService->getRecentDiaryEntries($user->id, $date);
+
+            // Ambil daily summary untuk tanggal yang dipilih
             $summary = $this->diaryService->getDailySummary($user->id, $date);
 
             $data = [
@@ -123,7 +126,15 @@ class DiaryController extends BaseController
                 $user
             );
 
-            return $this->sendResponse($entry, 'Diary entry added successfully.');
+            $summary = $this->diaryService->getDailySummary($user->id, $request->date);
+
+            $data = [
+                'entry' => $entry,
+                'summary' => $summary
+            ];
+
+
+            return $this->sendResponse($data, 'Diary entry added successfully.');
         } catch (\Exception $e) {
             return $this->sendError('Failed to create diary entry', [$e->getMessage()], 500);
         }

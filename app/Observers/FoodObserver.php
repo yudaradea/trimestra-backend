@@ -20,8 +20,10 @@ class FoodObserver
      */
     public function updated(Food $food): void
     {
-        if ($food->isDirty('image_path')) {
-            Storage::disk('public')->delete($food->getOriginal('image_path'));
+        if ($food->getOriginal('image_path') !== null) {
+            if ($food->isDirty('image_path')) {
+                Storage::disk('public')->delete($food->getOriginal('image_path'));
+            }
         }
     }
 

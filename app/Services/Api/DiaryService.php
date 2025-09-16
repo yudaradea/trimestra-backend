@@ -4,6 +4,7 @@ namespace App\Services\Api;
 
 use App\Models\DiaryEntry;
 use App\Models\DailyNutritionSummary;
+use App\Models\ExerciseRecord;
 use App\Models\Food;
 use App\Models\Recipe;
 use App\Models\User;
@@ -110,11 +111,13 @@ class DiaryService
                 $summary['total_carbs'] += $entry->carbs ?? 0;
                 $summary['total_fat'] += $entry->fat ?? 0;
                 $summary['total_fiber'] += $entry->fiber ?? 0;
+            } elseif ($entry->meal_type === 'exercise') {
+                $summary['total_calories_burned'] += $entry->calories_burned ?? 0;
             }
         }
 
         // Add calories burned from exercise records
-        $exerciseRecords = \App\Models\ExerciseRecord::where('user_id', $userId)
+        $exerciseRecords = ExerciseRecord::where('user_id', $userId)
             ->whereDate('start_time', $date)
             ->get();
 
@@ -122,9 +125,10 @@ class DiaryService
             $summary['total_calories_burned'] += $record->calories_burned ?? 0;
         }
 
-
+        // Dapatkan target calories dari user
         $targetCalories = $this->getUserTargetCalories($user);
 
+        // Update atau create daily nutrition summary
         DailyNutritionSummary::updateOrCreate(
             ['user_id' => $userId, 'date' => $date],
             array_merge($summary, ['target_calories' => $targetCalories])
@@ -140,7 +144,7 @@ class DiaryService
                 ->where('date', $date)
                 ->first();
 
-            // If no summary exists, create default one
+            // Jika tidak ada summary, buat default dengan nilai 0
             if (!$summary) {
                 $user = User::with('profile')->find($userId);
                 $targetCalories = $this->getUserTargetCalories($user);
