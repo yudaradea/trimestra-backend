@@ -23,6 +23,7 @@ class DiaryController extends BaseController
         $this->diaryService = $diaryService;
     }
 
+
     /**
      * @OA\Get(
      *     path="/diary",

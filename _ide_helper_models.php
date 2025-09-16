@@ -238,35 +238,6 @@ namespace App\Models{
 	class FoodCategory extends \Eloquent {}
 }
 
-namespace App\Models\Models{
-/**
- * @property int $id
- * @property int $user_id
- * @property int $device_id
- * @property string $exercise_type
- * @property int $duration
- * @property string $calories_burned
- * @property string $start_time
- * @property string $end_time
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereCaloriesBurned($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereDeviceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereDuration($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereEndTime($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereExerciseType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereStartTime($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExerciseRecord whereUserId($value)
- */
-	class ExerciseRecord extends \Eloquent {}
-}
-
 namespace App\Models{
 /**
  * @property int $id

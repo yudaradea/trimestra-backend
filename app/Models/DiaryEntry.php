@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class DiaryEntry extends Model
 {
@@ -38,6 +40,13 @@ class DiaryEntry extends Model
         'calories_burned' => 'decimal:2',
         'exercise_duration' => 'integer',
     ];
+
+    protected function date(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => Carbon::parse($value)->timezone(config('app.timezone'))->format('Y-m-d'),
+        );
+    }
 
     // Indexing untuk query optimization
     protected $with = []; // Tidak eager load by default karena bisa berat

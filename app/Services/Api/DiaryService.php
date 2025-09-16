@@ -9,6 +9,7 @@ use App\Models\Food;
 use App\Models\Recipe;
 use App\Models\User;
 use App\Services\Api\UserService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class DiaryService
@@ -138,6 +139,7 @@ class DiaryService
     public function getDailySummary($userId, $date)
     {
         $cacheKey = "daily_summary_{$userId}_{$date}";
+
 
         return Cache::remember($cacheKey, $this->cacheTtl, function () use ($userId, $date) {
             $summary = DailyNutritionSummary::where('user_id', $userId)
