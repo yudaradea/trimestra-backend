@@ -44,6 +44,30 @@ class UserFavoriteController extends BaseController
         return $this->sendResponse($favorite, 'Added to favorites successfully.');
     }
 
+    // search favorites
+    // public function search(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $query = $request->input('q');
+    //     $perPage = $request->input('per_page', 20);
+
+    //     if (!$query) {
+    //         return $this->sendError('Query parameter is required.');
+    //     }
+
+    //     $favorites = $user->favorites()
+    //         ->with(['food', 'recipe'])
+    //         ->whereHas('food', function ($query) use ($query) {
+    //             $query->where('name', 'like', '%' . $query . '%');
+    //         })
+    //         ->orWhereHas('recipe', function ($query) use ($query) {
+    //             $query->where('name', 'like', '%' . $query . '%');
+    //         })
+    //         ->paginate($perPage);
+
+    //     return $this->sendResponse($favorites, 'Favorites retrieved successfully.');
+    // }
+
     /**
      * Remove from favorites
      */

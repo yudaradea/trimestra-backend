@@ -73,6 +73,7 @@ Route::prefix('v1')->group(function () {
             // ⭐ FAVORITES
             Route::get('favorites', [UserFavoriteController::class, 'index']);
             Route::post('favorites', [UserFavoriteController::class, 'store']);
+            // Route::get('favorites/search', [UserFavoriteController::class, 'search']);
             Route::delete('favorites/{id}', [UserFavoriteController::class, 'destroy']);
 
             // 📓 DIARY

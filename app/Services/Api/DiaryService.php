@@ -138,35 +138,28 @@ class DiaryService
 
     public function getDailySummary($userId, $date)
     {
-        $cacheKey = "daily_summary_{$userId}_{$date}";
+        $summary = DailyNutritionSummary::where('user_id', $userId)
+            ->where('date', $date)
+            ->first();
 
+        if (!$summary) {
+            $user = User::with(['profile', 'preferences'])->find($userId);
+            $targetCalories = $this->getUserTargetCalories($user);
 
-        return Cache::remember($cacheKey, $this->cacheTtl, function () use ($userId, $date) {
-            $summary = DailyNutritionSummary::where('user_id', $userId)
-                ->where('date', $date)
-                ->first();
+            $summary = DailyNutritionSummary::create([
+                'user_id' => $userId,
+                'date' => $date,
+                'total_calories_intake' => 0,
+                'total_calories_burned' => 0,
+                'total_protein' => 0,
+                'total_carbs' => 0,
+                'total_fat' => 0,
+                'total_fiber' => 0,
+                'target_calories' => $targetCalories,
+            ]);
+        }
 
-            // Jika tidak ada summary, buat default dengan nilai 0
-            if (!$summary) {
-                $user = User::with('profile')->find($userId);
-                $targetCalories = $this->getUserTargetCalories($user);
-
-                $summary = DailyNutritionSummary::create([
-                    'user_id' => $userId,
-                    'date' => $date,
-                    'total_calories_intake' => 0,
-                    'total_calories_burned' => 0,
-                    'total_protein' => 0,
-                    'total_carbs' => 0,
-                    'total_fat' => 0,
-                    'total_fiber' => 0,
-                    'target_calories' => $targetCalories,
-                ]);
-            }
-
-
-            return $summary;
-        });
+        return $summary;
     }
 
     public function getUserTargetCalories($user)
@@ -249,12 +242,14 @@ class DiaryService
         }
 
         $date = $entry->date;
-        $entry->delete();
+        $deleted = $entry->delete();
 
-        // Update daily summary after deletion
-        $this->updateDailySummary($userId, $date);
+        if ($deleted) {
+            $this->updateDailySummary($userId, $date);
+            return true;
+        }
 
-        return true;
+        throw new \Exception('Failed to delete diary entry');
     }
 
     private function clearRelatedCaches($userId, $date)
